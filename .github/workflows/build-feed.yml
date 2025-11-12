@@ -20,7 +20,7 @@ jobs:
         with:
           python-version: '3.x'
 
-           - name: Build feed into /docs
+      - name: Build feed into /docs
         run: |
           set -euo pipefail
           mkdir -p docs
@@ -33,9 +33,10 @@ jobs:
           echo "HEAD docs/wisconsin-sports.xml"; head -n 20 docs/wisconsin-sports.xml || true
           echo "TAIL docs/wisconsin-sports.xml"; tail -n 20 docs/wisconsin-sports.xml || true
 
-
       - name: Commit updated XML to main
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "Auto-update RSS feed (/docs)"
-          file_pattern: docs/wisconsin-sports.xml docs/img/*
+          file_pattern: |
+            docs/wisconsin-sports.xml
+            docs/img/*
