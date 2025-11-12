@@ -11,8 +11,9 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout
+      - name: Checkout repo
         uses: actions/checkout@v4
 
       - name: Setup Python
@@ -20,23 +21,26 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Build feed into /docs
+      - name: Build RSS feed into /docs
         run: |
           set -euo pipefail
           mkdir -p docs
-          if [ -d img ]; then mkdir -p docs/img && cp -r img/* docs/img/ || true; fi
+          # copy image folder into docs/img
+          if [ -d img ]; then
+            mkdir -p docs/img
+            cp -r img/* docs/img/ || true
+          fi
+          # run the Python script
           python wisco_core_teams_rss_MEDIA5_ASCII.py \
             --out docs/wisconsin-sports.xml \
             --days 6 --max-items 240 --live-final-only \
             --prefer-event-photos --scrape-og \
             --fallback-base-url "https://gjngh001-glitch.github.io/risevision-sports2"
-          echo "HEAD docs/wisconsin-sports.xml"; head -n 20 docs/wisconsin-sports.xml || true
-          echo "TAIL docs/wisconsin-sports.xml"; tail -n 20 docs/wisconsin-sports.xml || true
+          echo "✅ RSS file generated:"
+          ls -l docs
 
-      - name: Commit updated XML to main
+      - name: Commit updated XML to main branch
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "Auto-update RSS feed (/docs)"
-          file_pattern: |
-            docs/wisconsin-sports.xml
-            docs/img/*
+          file_pattern: docs/wisconsin-sports.xml docs/img/*
